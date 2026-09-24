@@ -1,0 +1,9 @@
+export 'package:easy_life_club/providers/auth/auth_provider.dart';
+export 'package:easy_life_club/providers/calendar/calendar_provider.dart';
+export 'package:easy_life_club/providers/comment_provider.dart';
+export 'package:easy_life_club/providers/membership/membership_provider.dart';
+export 'package:easy_life_club/providers/menu_provider.dart';
+export 'package:easy_life_club/providers/services/selected_service_info.dart';
+export 'package:easy_life_club/providers/services/services_provider.dart';
+export 'package:easy_life_club/providers/event/event_provider.dart';
+export 'package:provider/provider.dart';

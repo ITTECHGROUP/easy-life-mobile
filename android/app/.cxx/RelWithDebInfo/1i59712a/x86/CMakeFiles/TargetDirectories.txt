@@ -1,0 +1,2 @@
+C:/Users/ASUS/IT-TechGroup/EasyLife/easy-life-mobile/android/app/.cxx/RelWithDebInfo/1i59712a/x86/CMakeFiles/edit_cache.dir
+C:/Users/ASUS/IT-TechGroup/EasyLife/easy-life-mobile/android/app/.cxx/RelWithDebInfo/1i59712a/x86/CMakeFiles/rebuild_cache.dir
