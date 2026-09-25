@@ -12,8 +12,11 @@ class PartnersCarousel extends StatelessWidget {
     final Map<String, dynamic> manifestMap = json.decode(manifestContent);
 
     // Filter the assets that are images in the assets/partners/ directory
+    // y excluimos el logo que no quieren mostrar (reemplaza 'dental_diamond' por el nombre real del archivo de la imagen)
     final imagePaths = manifestMap.keys
-        .where((String key) => key.startsWith('assets/partners/'))
+        .where((String key) => 
+            key.startsWith('assets/partners/') && 
+            !key.toLowerCase().contains('dental_diamond')) // <-- AQUÍ FILTRAS EL ITEM
         .toList();
 
     return imagePaths;
