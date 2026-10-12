@@ -1,13 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../constants/constants.dart';
 import '../../models/product.dart';
 import '../../models/service_response.dart';
 import 'package:easy_life_club/models/location.dart';
+import 'package:easy_life_club/models/vehicle_model.dart';
 
 class ServicesProvider with ChangeNotifier {
   final String _baseUrl = Constants.baseUrl;
@@ -18,27 +19,16 @@ class ServicesProvider with ChangeNotifier {
   int page = 1;
   bool loadMoreProducts = true;
   List<Product> products = [];
+  List<dynamic> firestoreVehicles = [];
+  Vehicle? selectedVehicle;
   String screeTitle = '';
 
-  List services = [
-    // cars
-    // yachts
-    // apartments
-    // ...
-  ];
+  List services = [];
 
   var otherServiceInfo = {};
-  List otherServices = [
-    // transportation
-    // ...
-  ];
+  List otherServices = [];
 
-  List otherServicesItems = [
-    // transportation 1
-    // transportation 2
-    // transportation 3
-    // ...
-  ];
+  List otherServicesItems = [];
 
   int selectedServiceId = 0;
 
@@ -63,10 +53,29 @@ class ServicesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedVehicle(Vehicle vehicle) {
+    selectedVehicle = vehicle;
+    notifyListeners();
+  }
+
+  Future<void> fetchVehiclesFromFirebase() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('vehicles').get();
+      firestoreVehicles = snapshot.docs.map((doc) {
+        return Vehicle.fromDoc(doc);
+      }).toList();
+    } catch (e) {
+      print('Error fetching vehicles from Firestore: $e');
+      firestoreVehicles = [];
+    }
+    notifyListeners();
+  }
+
   Future getProductsDetailFromApi(int id, {int? location}) async {
     if (!loadMoreProducts) return;
     final pageQuery = page.toString();
-    String query = location != null ? '&location=$location' : '';
+    String query = (location != null && location > 0) ? '&location=$location' : '';
     var url = Uri.parse(
       '$_baseUrl/api/v1/service/$id/detail_service/?page=$pageQuery$query&is_updated=true',
     );
@@ -99,8 +108,20 @@ class ServicesProvider with ChangeNotifier {
       '$_baseUrl/api/v1/service/$id/detail_service/?is_updated=true',
     );
     final response = await http.get(url);
-    final serviceResponse = jsonDecode(response.body)['products'];
-    otherServicesItems = serviceResponse;
+    final decoded = jsonDecode(response.body);
+
+    if (decoded != null && decoded['products'] != null) {
+      final productsData = decoded['products'];
+      if (productsData is Map && productsData.containsKey('results')) {
+        otherServicesItems = productsData['results'] as List? ?? [];
+      } else if (productsData is List) {
+        otherServicesItems = productsData;
+      } else {
+        otherServicesItems = [];
+      }
+    } else {
+      otherServicesItems = [];
+    }
     notifyListeners();
   }
 
@@ -112,9 +133,4 @@ class ServicesProvider with ChangeNotifier {
       jsonDecode(response.body).map((l) => Location.fromJson(l)),
     );
   }
-
-  // getProducts(int id) {
-  //   // return <Product>[];
-  //   return (services.firstWhere((element) => element.id == id).products);
-  // }
 }

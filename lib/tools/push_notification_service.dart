@@ -47,9 +47,14 @@ class PushNotificationService {
   }
 
   static Future initializeApp() async {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      // Si Firebase ya fue inicializado previamente, atrapamos y silenciamos el error
+      log('Firebase ya estaba inicializado: $e');
+    }
 
     await messaging.setForegroundNotificationPresentationOptions(
       alert: true,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 
 import '../constants/constants.dart';
 import '../models/product.dart';
+import '../models/vehicle_model.dart';
 import '../providers/services/services_provider.dart';
 import '../theme/app_theme.dart';
 import '../widgets/base/base.dart';
@@ -20,8 +20,6 @@ class ProductScreen extends StatefulWidget {
 }
 
 class _ProductScreenState extends State<ProductScreen> {
-  List<Product> products = [];
-
   bool loading = false;
 
   @override
@@ -44,16 +42,19 @@ class _ProductScreenState extends State<ProductScreen> {
     );
 
     final List<Product> products = servicesProvider.products;
-
     final id = servicesProvider.selectedServiceId;
     String screenTitle = servicesProvider.screeTitle;
-    final String serviceType = servicesProvider.serviceType!;
+    final String serviceType = servicesProvider.serviceType ?? '';
+
+    // Condición exclusiva para aislar Cars for Sale (Firebase)
+    final bool isCarsForSale = screenTitle.toLowerCase().contains('cars for sale');
 
     final ScrollController controller = ScrollController();
 
     controller.addListener(
       () async {
-        if (controller.offset > (controller.position.maxScrollExtent) &&
+        if (!isCarsForSale &&
+            controller.offset > (controller.position.maxScrollExtent) &&
             !loading &&
             servicesProvider.loadMoreProducts) {
           loading = true;
@@ -94,48 +95,116 @@ class _ProductScreenState extends State<ProductScreen> {
               child: Column(
                 children: [
                   serviceType == 'state' ? const _Founder() : Container(),
-                  if (products.isEmpty)
-                    widget.wait
-                        ? const LoadingDialog(message: 'Loading...')
-                        : const ToastNotification(
-                            message: 'There are no products for this service',
-                            error: true,
+                  
+                  if (isCarsForSale)
+                    _buildCarsForSaleList(context, servicesProvider)
+                  else ...[
+                    // CÓDIGO ORIGINAL EXACTO PARA AWS (Wellness, Services, Cars Renta, Real Estate, etc.)
+                    if (products.isEmpty)
+                      widget.wait
+                          ? const LoadingDialog(message: 'Loading...')
+                          : const ToastNotification(
+                              message: 'There are no products for this service',
+                              error: true,
+                            ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: products.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 16),
+                          child: InkWell(
+                            onTap: () {
+                              updateSelectedProduct(products[index]);
+                            },
+                            child: CustomCard(
+                              imgURL: products[index].images.isNotEmpty
+                                  ? products[index].images[0].image
+                                  : Constants.noImageURL,
+                              title: products[index].name,
+                              price: products[index].price,
+                              route: servicesProvider.serviceType == 'others'
+                                  ? 'service_detail'
+                                  : 'car_info',
+                              description: products[index].description,
+                              isApartment: serviceType == 'aparment' ||
+                                      serviceType == 'villa' ||
+                                      serviceType == 'state',
+                            ),
                           ),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: products.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 16),
-                        child: InkWell(
-                          onTap: () {
-                            updateSelectedProduct(products[index]);
-                          },
-                          child: CustomCard(
-                            imgURL: products[index].images.isNotEmpty
-                                ? products[index].images[0].image
-                                : Constants.noImageURL,
-                            title: products[index].name,
-                            price: products[index].price,
-                            route: 'car_info',
-                            description: products[index].description,
-                            isApartment: serviceType == 'aparment' ||
-                                    serviceType == 'villa' ||
-                                    serviceType == 'state'
-                                ? true
-                                : false,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      },
+                    ),
+                  ],
                 ],
               ),
             )
           ],
         ),
       ),
+    );
+  }
+
+  // MÉTODO ISOLADO PARA FIRESTORE (Cars For Sale)
+  Widget _buildCarsForSaleList(
+    BuildContext context,
+    ServicesProvider servicesProvider,
+  ) {
+    final List<dynamic> firestoreVehicles = servicesProvider.firestoreVehicles;
+
+    if (firestoreVehicles.isEmpty) {
+      return widget.wait
+          ? const LoadingDialog(message: 'Loading...')
+          : const ToastNotification(
+              message: 'There are no cars for sale at the moment',
+              error: true,
+            );
+    }
+
+    String formatPrice(String val) {
+      return val.replaceAll('\$', '').trim();
+    }
+
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: firestoreVehicles.length,
+      itemBuilder: (BuildContext context, int index) {
+        final item = firestoreVehicles[index];
+
+        if (item is Vehicle) {
+          final String priceLabelStr = item.priceLabel.toString();
+          final String priceStr = item.price.toString();
+          final String rawPrice =
+              priceLabelStr.isNotEmpty ? priceLabelStr : priceStr;
+          final String price = formatPrice(rawPrice);
+          final String imgUrl =
+              item.image.isNotEmpty ? item.image : Constants.noImageURL;
+          final String description = item.description is List
+              ? (item.description as List).join('\n')
+              : item.description.toString();
+
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            child: InkWell(
+              onTap: () {
+                servicesProvider.setSelectedVehicle(item);
+                Navigator.of(context).pushNamed('vehicle_detail');
+              },
+              child: CustomCard(
+                imgURL: imgUrl,
+                title: item.name,
+                price: price,
+                route: 'vehicle_detail',
+                description: description,
+                isApartment: false,
+              ),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

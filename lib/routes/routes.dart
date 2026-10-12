@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/screens.dart';
 import 'package:easy_life_club/screens/sub_service_detail_screen.dart';
+import 'package:easy_life_club/screens/vehicle_detail_screen.dart';
 
 class AppRoutes {
   static const initialRoute = 'splash';
@@ -9,7 +10,8 @@ class AppRoutes {
   static Map<String, Widget Function(BuildContext)> routes = {
     initialRoute: (BuildContext context) => const SplashScreen(),
     'calendar': (BuildContext context) => const CalendarScreen(),
-    'car_info': (BuildContext context) => const ProductDetailScreen(),
+    'car_info': (BuildContext context) => const ProductDetailScreen(), // RUTA ORIGINAL AWS
+    'vehicle_detail': (BuildContext context) => const VehicleDetailScreen(), // NUEVA RUTA FIRESTORE
     'products': (BuildContext context) {
       Map? args = ModalRoute.of(context)!.settings.arguments as Map?;
       String? subtitle = args?['subtitle'];
@@ -32,10 +34,4 @@ class AppRoutes {
         const ProductImagesFullScreen(),
     'faq': (BuildContext context) => const FAQScreen(),
   };
-
-  // static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
-  //   return MaterialPageRoute(
-  //     builder: (context) => const NotFoundPage(),
-  //   );
-  // }
 }

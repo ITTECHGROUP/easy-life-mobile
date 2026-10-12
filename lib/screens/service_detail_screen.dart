@@ -16,12 +16,18 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final servicesProvider = Provider.of<ServicesProvider>(context);
-    final otherServicesData = servicesProvider.otherServicesItems;
+    final List otherServicesData = servicesProvider.otherServicesItems is List
+        ? servicesProvider.otherServicesItems
+        : [];
+
+    final String title =
+        servicesProvider.otherServiceInfo['title'] ?? 'SERVICE';
+    final String? image = servicesProvider.otherServiceInfo['image'];
 
     return Scaffold(
       backgroundColor: const Color(0xff1A1E23),
       appBar: CustomAppBar(
-        title: servicesProvider.otherServiceInfo['title'],
+        title: title,
         showArrowBack: true,
       ),
       body: SafeArea(
@@ -33,22 +39,20 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 170,
-                    width: double.infinity,
-                    child: Image(
-                      image: NetworkImage(
-                        servicesProvider.otherServiceInfo['image'],
+                  if (image != null && image.isNotEmpty)
+                    SizedBox(
+                      height: 170,
+                      width: double.infinity,
+                      child: Image(
+                        image: NetworkImage(image),
+                        fit: BoxFit.cover,
                       ),
-                      fit: BoxFit.cover,
                     ),
-                  ),
                   const SizedBox(height: 16),
                   Container(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-
                         const SizedBox(height: 10),
                         ...List.generate(
                           otherServicesData.length,

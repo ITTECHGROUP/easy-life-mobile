@@ -15,9 +15,13 @@ import 'tools/push_notification_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await dotenv.load();
+  // Carga las variables de entorno de manera segura antes de correr la app
+  await dotenv.load(fileName: ".env");
+
   await PushNotificationService.initializeApp();
-  await Firebase.initializeApp();
+  // Firebase.initializeApp() ya se ejecuta dentro de PushNotificationService, 
+  // por lo que eliminamos la línea duplicada que causaba el error [core/duplicate-app].
+
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   FlutterError.onError = (errorDetails) {
       FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);

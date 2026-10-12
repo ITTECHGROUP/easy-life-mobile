@@ -1,80 +1,71 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:carousel_slider/carousel_slider.dart';
 
 class PartnersCarousel extends StatelessWidget {
   const PartnersCarousel({super.key});
 
-  Future<List<String>> _loadAssetImages() async {
-    // Load the asset manifest
-    final manifestContent = await rootBundle.loadString('AssetManifest.json');
-    final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-
-    // Filter the assets that are images in the assets/partners/ directory
-    // y excluimos el logo que no quieren mostrar (reemplaza 'dental_diamond' por el nombre real del archivo de la imagen)
-    final imagePaths = manifestMap.keys
-        .where((String key) => 
-            key.startsWith('assets/partners/') && 
-            !key.toLowerCase().contains('dental_diamond')) // <-- AQUÍ FILTRAS EL ITEM
-        .toList();
-
-    return imagePaths;
+  List<String> _loadAssetImages() {
+    return const [
+      'assets/partners/1.png',
+      'assets/partners/2.png',
+      'assets/partners/3.png',
+      'assets/partners/5.png',
+      'assets/partners/6.png',
+      'assets/partners/7.png',
+      'assets/partners/8.png',
+      'assets/partners/9.png',
+      'assets/partners/10.png',
+      'assets/partners/11.png',
+      'assets/partners/12.png',
+      'assets/partners/13.PNG',
+      'assets/partners/14.PNG',
+      'assets/partners/15.PNG',
+      'assets/partners/16.png',
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<String>>(
-      future: _loadAssetImages(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Error loading images'));
-        } else {
-          final imagePaths = snapshot.data!;
-          return Column(
-            children: [
-              const SizedBox(
-                height: 10,
-              ),
-              const Text(
-                'OUR PARTNERS',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-              const SizedBox(
-                width: 30,
-                child: Divider(
-                  color: Colors.white,
-                  thickness: 1,
-                ),
-              ),
-              CarouselSlider.builder(
-                itemCount: imagePaths.length,
-                options: CarouselOptions(
-                  aspectRatio: 0.65,
-                  viewportFraction: 0.65,
-                  height: 170,
-                  autoPlay: true,
-                  autoPlayInterval: const Duration(seconds: 2),
-                  enlargeCenterPage: true,
-                  enlargeFactor: 0,
-                  // enlargeStrategy: CenterPageEnlargeStrategy.height,
-                ),
-                itemBuilder: (context, index, _) {
-                  return Image.asset(
-                    imagePaths[index],
-                    fit: BoxFit.contain,
-                  );
-                },
-              ),
-            ],
-          );
-        }
-      },
+    final imagePaths = _loadAssetImages();
+
+    return Column(
+      children: [
+        const SizedBox(height: 10),
+        const Text(
+          'OUR PARTNERS',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w400,
+            color: Colors.white,
+          ),
+        ),
+        const SizedBox(
+          width: 30,
+          child: Divider(
+            color: Colors.white,
+            thickness: 1,
+          ),
+        ),
+        const SizedBox(height: 10),
+        CarouselSlider.builder(
+          itemCount: imagePaths.length,
+          options: CarouselOptions(
+            aspectRatio: 0.65,
+            viewportFraction: 0.65,
+            height: 170,
+            autoPlay: true,
+            autoPlayInterval: const Duration(seconds: 2),
+            enlargeCenterPage: true,
+            enlargeFactor: 0,
+          ),
+          itemBuilder: (context, index, _) {
+            return Image.asset(
+              imagePaths[index],
+              fit: BoxFit.contain,
+            );
+          },
+        ),
+      ],
     );
   }
 }

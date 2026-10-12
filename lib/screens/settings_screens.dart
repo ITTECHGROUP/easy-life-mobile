@@ -37,7 +37,7 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     GestureDetector(
-                      onTap:() => Navigator.of(context).pushNamed("faq"),
+                      onTap: () => Navigator.of(context).pushNamed("faq"),
                       child: const _SettingsOption(
                         title: "FAQ",
                         subtitle:
@@ -72,7 +72,7 @@ class SettingsScreen extends StatelessWidget {
                       child: const _SettingsOption(
                         title: "Terms and conditions",
                         subtitle:
-                            "Manage your account”s security and keep track of your account”s usage including apps that you have connected to your account.",
+                            "Manage your account’s security and keep track of your account’s usage including apps that you have connected to your account.",
                         leadingIcon:
                             "assets/icons/terms_and_conditions_icon.svg",
                         trailingIcon: Icons.arrow_forward_ios_rounded,
@@ -91,18 +91,6 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           )
                         : Container(),
-
-                    // islogged
-                    //     ? GestureDetector(
-
-                    //         child: const _SettingsOption(
-                    //           title: "Logout",
-                    //           leadingIcon: "assets/icons/logout_icon.svg",
-                    //           trailingIcon: Icons.arrow_forward_ios_rounded,
-                    //         ),
-                    //       )
-                    //     : Container(),
-
                     islogged
                         ? GestureDetector(
                             onTap: () => _closeSessionDialog(
@@ -120,35 +108,35 @@ class SettingsScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 16),
-                                  leading: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 8.0, top: 4.0),
-                                        child: SvgPicture.asset(
-                                          "assets/icons/logout_icon.svg",
-                                          color: Colors.white,
-                                        ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 6, horizontal: 16),
+                                leading: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 8.0, top: 4.0),
+                                      child: SvgPicture.asset(
+                                        "assets/icons/logout_icon.svg",
+                                        color: Colors.white,
                                       ),
-                                    ],
-                                  ),
-                                  trailing: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: const [
-                                      Icon(
-                                        Icons.arrow_forward_ios_rounded,
-                                        size: 16,
-                                      ),
-                                    ],
-                                  ),
-                                  title: Text(
-                                    "Logout",
-                                    style:
-                                        AppTheme.darkTheme.textTheme.bodyLarge,
-                                  )),
+                                    ),
+                                  ],
+                                ),
+                                trailing: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(
+                                      Icons.arrow_forward_ios_rounded,
+                                      size: 16,
+                                    ),
+                                  ],
+                                ),
+                                title: Text(
+                                  "Logout",
+                                  style:
+                                      AppTheme.darkTheme.textTheme.bodyLarge,
+                                )),
                             ),
                           )
                         : Container(),
@@ -259,7 +247,8 @@ void _closeSessionDialog(BuildContext context, AuthProvider auth) async {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(FontAwesomeIcons.arrowRightToBracket),
+          // CORREGIDO AQUÍ: Usamos FaIcon en lugar de Icon
+          const FaIcon(FontAwesomeIcons.arrowRightToBracket),
           const SizedBox(height: 20),
           Text(
             "Logout",

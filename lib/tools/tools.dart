@@ -25,28 +25,45 @@ class Tools {
 The $productName ($productType) will soon be yours. 
 In order to complete the experience, we have to conclude with the payment stage.""";
 
-    if (Platform.isAndroid) {
-      var whatsappURLAndroid =
-          "whatsapp://send?phone=$phoneNumber&text=$message";
-      await launchUrl(Uri.parse(whatsappURLAndroid));
-    } else {
-      var whatsappURL = "https://wa.me/$phoneNumber?text=$message";
-      await launchUrl(Uri.parse(whatsappURL));
-    }
+    await _launchWhatsApp(phoneNumber, message);
   }
 
   static Future<void> sendSimpleWhatsAppMessage(
     String message,
   ) async {
     var phoneNumber = "+17862961703";
+    await _launchWhatsApp(phoneNumber, message);
+  }
+
+  // Método privado para manejar el lanzamiento de forma segura en cualquier plataforma
+  static Future<void> _launchWhatsApp(String phoneNumber, String message) async {
+    final encodedMessage = Uri.encodeComponent(message);
 
     if (Platform.isAndroid) {
-      var whatsappURLAndroid =
-          "whatsapp://send?phone=$phoneNumber&text=$message";
-      await launchUrl(Uri.parse(whatsappURLAndroid));
+      final whatsappURLAndroid = Uri.parse(
+        "whatsapp://send?phone=$phoneNumber&text=$encodedMessage",
+      );
+      
+      // Si la app de WhatsApp está instalada, la abre; si no (como en BlueStacks), hace fallback a la web
+      if (await canLaunchUrl(whatsappURLAndroid)) {
+        await launchUrl(whatsappURLAndroid);
+      } else {
+        final whatsappURLWeb = Uri.parse(
+          "https://wa.me/$phoneNumber?text=$encodedMessage",
+        );
+        await launchUrl(
+          whatsappURLWeb,
+          mode: LaunchMode.externalApplication,
+        );
+      }
     } else {
-      var whatsappURL = "https://wa.me/$phoneNumber?text=$message";
-      await launchUrl(Uri.parse(whatsappURL));
+      final whatsappURL = Uri.parse(
+        "https://wa.me/$phoneNumber?text=$encodedMessage",
+      );
+      await launchUrl(
+        whatsappURL,
+        mode: LaunchMode.externalApplication,
+      );
     }
   }
 }
