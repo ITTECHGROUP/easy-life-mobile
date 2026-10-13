@@ -23,18 +23,16 @@ Future<void> main() async {
   }
 
   await PushNotificationService.initializeApp();
-  // Firebase.initializeApp() ya se ejecuta dentro de PushNotificationService, 
-  // por lo que eliminamos la línea duplicada que causaba el error [core/duplicate-app].
 
   // Pass all uncaught "fatal" errors from the framework to Crashlytics
   FlutterError.onError = (errorDetails) {
-      FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-    };
-    // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
-    PlatformDispatcher.instance.onError = (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      return true;
-    };
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+  // Pass all uncaught asynchronous errors that aren't handled by the Flutter framework to Crashlytics
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 
   runApp(const AppState());
 }
@@ -102,9 +100,7 @@ class _MyAppState extends State<MyApp> {
           );
         }
         await servicesProvider.getProductsDetailFromApi(notification.serviceId);
-        
       }
-
 
       switch (notification.appState) {
         case AppStates.foreground:
@@ -145,7 +141,6 @@ class _MyAppState extends State<MyApp> {
           break;
       }
     });
-    
   }
 
   @override
