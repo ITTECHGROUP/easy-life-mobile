@@ -15,8 +15,12 @@ import 'tools/push_notification_service.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Carga las variables de entorno de manera segura antes de correr la app
-  await dotenv.load(fileName: ".env");
+  // Carga las variables de entorno de manera segura para evitar crasheos en iOS
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    debugPrint("⚠️ Error cargando .env: $e");
+  }
 
   await PushNotificationService.initializeApp();
   // Firebase.initializeApp() ya se ejecuta dentro de PushNotificationService, 
