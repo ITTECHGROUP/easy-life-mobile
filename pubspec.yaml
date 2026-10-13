@@ -2,7 +2,7 @@ name: easy_life_club
 description: A new Flutter project.
 publish_to: "none"
 
-version: 1.4.11+46
+version: 1.4.13+62
 
 environment:
   sdk: ">=3.2.0-134.1.beta <4.0.0"
@@ -26,7 +26,7 @@ dependencies:
   font_awesome_flutter: ^11.0.0
   google_fonts: ^6.2.1
   http: ^1.1.0
-  intl: ^0.19.0                # <--- AGREGADO PARA FORMATEAR PRECIOS ($12,000)
+  intl: ^0.19.0                  # <--- AGREGADO PARA FORMATEAR PRECIOS ($12,000)
   new_version_plus: ^0.1.0
   provider: ^6.0.3
   rxdart: ^0.28.0
