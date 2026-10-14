@@ -20,6 +20,7 @@ class PartnersCarousel extends StatelessWidget {
       'assets/partners/15.PNG',
       'assets/partners/16.png',
       'assets/partners/17.png',
+      'assets/partners/18.png',
     ];
   }
 
