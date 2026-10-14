@@ -2,7 +2,7 @@ name: easy_life_club
 description: A new Flutter project.
 publish_to: "none"
 
-version: 1.4.14+7
+version: 1.4.14+8
 
 environment:
   sdk: ">=3.2.0-134.1.beta <4.0.0"
