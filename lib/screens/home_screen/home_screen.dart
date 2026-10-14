@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       }
 
-      // Insertar el elemento "Cars for sale" como nuevo
+      // Insertar el elemento "Cars for sale" como nuevo con tu nueva imagen de fondo
       bool exists = menu.any((item) => item.name.toLowerCase().contains('cars for sale'));
       if (!exists) {
         menu.add(
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
             id: 8888,
             name: 'Cars for sale',
             route: 'cars',
-            image: 'assets/hero-red-ferrari.webp',
+            image: 'assets/carsForSaleBackground.jpeg',
           ),
         );
       }
