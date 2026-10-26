@@ -471,7 +471,9 @@ class _WelcomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final hour = DateTime.now().hour;
     final greeting = hour < 12 ? 'Good morning' : (hour < 19 ? 'Good afternoon' : 'Good evening');
-    return Padding(
+    // Full width so the parent Column (which centers its children) can't center the block.
+    return Container(
+      width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
