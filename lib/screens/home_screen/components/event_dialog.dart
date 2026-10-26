@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/widgets/base/app_network_image.dart';
 import 'package:easy_life_club/providers/providers.dart';
 import 'package:easy_life_club/theme/app_theme.dart';
 
@@ -63,8 +64,8 @@ class _EventDialogState extends State<EventDialog> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: 
-                Image.network(
-                  event.image,
+                Image(
+                  image: appImageProvider(event.image, width: 1200),
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
                     return Container(

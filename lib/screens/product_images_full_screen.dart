@@ -1,4 +1,5 @@
 import 'package:easy_life_club/models/product.dart';
+import 'package:easy_life_club/widgets/base/app_network_image.dart';
 import 'package:easy_life_club/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
@@ -58,10 +59,11 @@ class _ProductImagesFullScreenState extends State<ProductImagesFullScreen>
           boundaryMargin: const EdgeInsets.all(80),
           child: FadeInImage(
             placeholder: const AssetImage('assets/loading_indicator.gif'),
-            image: NetworkImage(
+            image: appImageProvider(
               images[index] is ProductImage
                   ? images[index].image
                   : images[index],
+              width: 2000,
             ),
             fit: BoxFit.contain,
           ),

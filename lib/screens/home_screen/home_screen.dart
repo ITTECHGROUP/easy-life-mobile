@@ -1,4 +1,8 @@
 import 'dart:developer';
+import 'package:easy_life_club/providers/auth/auth_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:easy_life_club/widgets/marketing_opt_in_sheet.dart';
 import 'package:easy_life_club/screens/home_screen/components/social_networks_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_life_club/models/menu_option.dart';
@@ -15,14 +19,14 @@ import 'package:easy_life_club/screens/home_screen/components/event_dialog.dart'
 /// Dorado de la webpage (Easy Life Cars)
 const Color _kGold = Color(0xFFD4AF37);
 
-const double _cardRadius = 24;
+const double _cardRadius = 22;
 const double _cardMarginH = 0;
 const double _cardMarginV = 12;
 
 const double _imageInsetH = 8;
 const double _imageInsetTop = 12;
 const double _imageBottomFraction = 0.77;
-const double _imageRadius = 18;
+const double _imageRadius = 17;
 
 /// Orden del home:
 /// 0 Rental cars, 1 Rental yachts, 2 Private transports, 3 Private jets,
@@ -55,6 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool? fetched;
   String error = '';
   List<MenuOption>? storedMenu;
+  // Order saved from the admin panel (Firestore `config/menu`); empty = default ranking.
+  List<String> _remoteOrder = const [];
   int _currentEventIndex = 0;
 
   Future<void> checkNotificationsPermissions() async {
@@ -67,6 +73,22 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!hasPermission) {
       await PushNotificationService.requestPermission();
     }
+  }
+
+  Future<void> _loadMenuOrder() async {
+    try {
+      final snap = await FirebaseFirestore.instance.collection('config').doc('menu').get();
+      final order = List<String>.from((snap.data()?['order'] as List?) ?? const []);
+      if (mounted && order.isNotEmpty) setState(() => _remoteOrder = order);
+    } catch (e) {
+      log('Menu order unavailable, using default: $e');
+    }
+  }
+
+  int _rank(MenuOption item) {
+    final key = item.id == 8888 ? 'cars_for_sale' : 'service:${item.id}';
+    final i = _remoteOrder.indexOf(key);
+    return i >= 0 ? i : _remoteOrder.length + _menuRank(item);
   }
 
   Future<void> preLoadMenu() async {
@@ -119,11 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     checkNotificationsPermissions();
     preLoadMenu();
+    _loadMenuOrder();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final eventProvider = Provider.of<EventProvider>(context, listen: false);
       await _getEvents(eventProvider);
       _showEventDialog();
+      if (mounted) maybeShowMarketingOptIn(context);
     });
   }
 
@@ -186,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       menu.sort((a, b) {
-        final cmp = _menuRank(a).compareTo(_menuRank(b));
+        final cmp = _rank(a).compareTo(_rank(b));
         if (cmp != 0) return cmp;
         return a.name.toLowerCase().compareTo(b.name.toLowerCase());
       });
@@ -321,8 +345,10 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
 
+    final username = '${Provider.of<AuthProvider>(context).user['username'] ?? ''}';
+
     return Scaffold(
-      backgroundColor: AppTheme.primary,
+      backgroundColor: AppTheme.baseColor,
       appBar: const CustomAppBar(
         title: 'HOME',
         icon: Icons.settings,
@@ -357,6 +383,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                     : Column(
                         children: [
+                          _WelcomeHeader(username: username),
                           ...menuItems,
                           const PartnersCarousel(),
                           const SizedBox(height: 10),
@@ -435,4 +462,39 @@ class _NewCardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _NewCardPainter oldDelegate) => false;
+}
+
+class _WelcomeHeader extends StatelessWidget {
+  const _WelcomeHeader({required this.username});
+  final String username;
+
+  @override
+  Widget build(BuildContext context) {
+    final hour = DateTime.now().hour;
+    final greeting = hour < 12 ? 'Good morning' : (hour < 19 ? 'Good afternoon' : 'Good evening');
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'EASY LIFE CLUB',
+            style: GoogleFonts.poppins(fontSize: 11, letterSpacing: 2.4, fontWeight: FontWeight.w600, color: AppTheme.gold),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            username.isEmpty ? greeting : '$greeting, $username',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            'What would you like to enjoy today?',
+            style: GoogleFonts.poppins(fontSize: 13, color: AppTheme.secondary),
+          ),
+        ],
+      ),
+    );
+  }
 }

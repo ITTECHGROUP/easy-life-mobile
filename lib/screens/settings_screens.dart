@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/widgets/marketing_opt_in_sheet.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,7 +19,7 @@ class SettingsScreen extends StatelessWidget {
     final islogged = authProvider.isLogged;
 
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       appBar: const CustomAppBar(
         title: "SETTINGS",
         showArrowBack: true,
@@ -43,6 +44,15 @@ class SettingsScreen extends StatelessWidget {
                         subtitle:
                             "Find answers to common questions about using EasyLife.",
                         leadingIcon: "assets/icons/question_mark_icon.svg",
+                        trailingIcon: Icons.arrow_forward_ios_rounded,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => showMarketingOptIn(context),
+                      child: const _SettingsOption(
+                        title: "Email news & offers",
+                        subtitle: "Get exclusive offers, new arrivals and private events by email. Subscribe or unsubscribe anytime.",
+                        leadingIcon: "assets/icons/browser_icon.svg",
                         trailingIcon: Icons.arrow_forward_ios_rounded,
                       ),
                     ),
@@ -98,7 +108,7 @@ class SettingsScreen extends StatelessWidget {
                               authProvider,
                             ),
                             child: Card(
-                              color: const Color(0xff1A1E23),
+                              color: AppTheme.surface,
                               elevation: 16,
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               shape: RoundedRectangleBorder(
@@ -172,12 +182,12 @@ class _SettingsOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xff1A1E23),
-      elevation: 16,
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      color: AppTheme.surface.withOpacity(0.72),
+      elevation: 0,
+      margin: const EdgeInsets.symmetric(vertical: 6),
       shape: RoundedRectangleBorder(
-        side: BorderSide(color: Colors.black.withOpacity(0.05), width: 1),
-        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.white.withOpacity(0.07), width: 1),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: ListTile(
         leading: Column(

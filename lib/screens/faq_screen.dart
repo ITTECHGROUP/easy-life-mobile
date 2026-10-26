@@ -1,6 +1,7 @@
 // ignore_for_file: lines_longer_than_80_chars
 
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/theme/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/base/base.dart';
 
@@ -11,7 +12,7 @@ class FAQScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     
     return const Scaffold(
-      backgroundColor: Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       appBar: CustomAppBar(title: 'FAQ',showArrowBack: true,),
       body: SafeArea(
         child: Stack(

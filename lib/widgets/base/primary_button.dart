@@ -28,52 +28,31 @@ class _PrimaryButtonState extends State<PrimaryButton> {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeIn,
-      height: !_isPressed ? 50 : 50,
-      // width: !_isPressed ? 148 : 150,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+      height: 52,
       decoration: BoxDecoration(
-        // gradient color
-        gradient: const LinearGradient(
-          colors: [
-            Color.fromARGB(209, 20, 20, 20),
-            AppTheme.primary,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppTheme.goldGradient,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: !_isPressed
-            ? const [
-                BoxShadow(
-                  color: Color.fromARGB(106, 0, 0, 0),
-                  offset: Offset(3, 6),
-                  blurRadius: 6,
-                  spreadRadius: 1,
-                ),
-                BoxShadow(
-                  color: Color.fromARGB(108, 54, 54, 54),
-                  offset: Offset(-3, -3),
-                  blurRadius: 6,
-                  spreadRadius: 1,
-                ),
-              ]
-            : [
-                const BoxShadow(
-                  color: Color.fromARGB(185, 22, 22, 22),
-                  offset: Offset(3, 3),
-                  blurRadius: 6,
-                  spreadRadius: 1,
-                )
-              ],
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.gold.withOpacity(_isPressed ? 0.15 : 0.28),
+            blurRadius: _isPressed ? 8 : 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 26.0),
         child: Center(
           child: Text(
             widget.text,
-            style:
-                AppTheme.darkTheme.textTheme.titleSmall!.copyWith(fontSize: 20),
+            style: AppTheme.darkTheme.textTheme.titleSmall!.copyWith(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.6,
+              color: const Color(0xff1A1408),
+            ),
           ),
         ),
       ),

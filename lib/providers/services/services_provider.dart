@@ -62,9 +62,12 @@ class ServicesProvider with ChangeNotifier {
     try {
       final snapshot =
           await FirebaseFirestore.instance.collection('vehicles').get();
-      firestoreVehicles = snapshot.docs.map((doc) {
-        return Vehicle.fromDoc(doc);
-      }).toList();
+      // Same visibility rule as the website: "hidden" cars are drafts managed from the panel.
+      firestoreVehicles = snapshot.docs
+          .where((doc) => (doc.data()['status'] ?? '').toString() != 'hidden')
+          .map((doc) => Vehicle.fromDoc(doc))
+          .toList()
+        ..sort((a, b) => (b.featured ? 1 : 0).compareTo(a.featured ? 1 : 0));
     } catch (e) {
       print('Error fetching vehicles from Firestore: $e');
       firestoreVehicles = [];

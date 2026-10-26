@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/services/marketing_service.dart';
+import 'package:easy_life_club/widgets/marketing_opt_in_sheet.dart';
 
 import '../constants/constants.dart';
 import '../providers/providers.dart';
@@ -45,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     //     selectedMembership['name'].toString().toUpperCase();
 
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       appBar: const CustomAppBar(
         title: 'PROFILE',
         // selectedServiceInfo.serviceTitle
@@ -101,6 +103,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   // todo: end of membership info
+                  const SizedBox(height: 24),
+                  const _EmailUpdatesTile(),
 
                   const SizedBox(height: 40),
                   const _CommentField(),
@@ -286,6 +290,80 @@ class _ProgressIndicator extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// Profile entry to subscribe/unsubscribe from email news and offers.
+class _EmailUpdatesTile extends StatefulWidget {
+  const _EmailUpdatesTile();
+
+  @override
+  State<_EmailUpdatesTile> createState() => _EmailUpdatesTileState();
+}
+
+class _EmailUpdatesTileState extends State<_EmailUpdatesTile> {
+  String email = '';
+  bool consent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final e = await MarketingService.savedEmail();
+    final c = await MarketingService.savedConsent();
+    if (mounted) setState(() {
+      email = e;
+      consent = c;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () async {
+          await showMarketingOptIn(context);
+          _load();
+        },
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: AppTheme.glass(radius: 20, highlighted: consent),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(shape: BoxShape.circle, color: AppTheme.gold.withOpacity(0.12)),
+                child: const Icon(Icons.mail_outline_rounded, color: AppTheme.gold),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Email news & offers', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 2),
+                    Text(
+                      consent ? 'Subscribed · $email' : 'Not subscribed · tap to join',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12.5, color: AppTheme.secondary),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right_rounded, color: AppTheme.secondary),
+            ],
+          ),
+        ),
       ),
     );
   }

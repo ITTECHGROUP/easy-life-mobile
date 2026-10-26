@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_life_club/theme/app_theme.dart';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       body: SafeArea(
         child: Stack(
           children: [

@@ -1,4 +1,5 @@
 import 'package:easy_life_club/constants/constants.dart';
+import 'package:easy_life_club/widgets/base/app_network_image.dart';
 import 'package:easy_life_club/theme/app_theme.dart';
 import 'package:easy_life_club/utils.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       appBar: const CustomAppBar(
         title: "BOOK",
         showArrowBack: true,
@@ -82,7 +83,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     margin: const EdgeInsets.symmetric(vertical: 10),
                     width: MediaQuery.of(context).size.width * 0.6,
                     decoration: BoxDecoration(
-                      color: const Color(0xff1A1E23),
+                      color: AppTheme.surface,
                       borderRadius: BorderRadius.circular(40),
                     ),
                     child: Row(
@@ -221,7 +222,7 @@ class _TableRangeExampleStateState extends State<_TableRangeExampleState> {
     ],
     borderRadius: BorderRadius.circular(50.0),
     border: Border.all(
-      color: const Color(0xff1A1E23),
+      color: AppTheme.surface,
       width: 0.6,
     ),
   );
@@ -229,7 +230,7 @@ class _TableRangeExampleStateState extends State<_TableRangeExampleState> {
   var noAvailableService = BoxDecoration(
     gradient: const RadialGradient(
       colors: [
-        Color(0xff1A1E23),
+        AppTheme.surface,
         Color.fromARGB(106, 0, 0, 0),
       ],
       radius: 3,
@@ -245,7 +246,7 @@ class _TableRangeExampleStateState extends State<_TableRangeExampleState> {
     ],
     borderRadius: BorderRadius.circular(50.0),
     border: Border.all(
-      color: const Color(0xff1A1E23),
+      color: AppTheme.surface,
       width: 0.6,
     ),
   );
@@ -411,7 +412,7 @@ class _TableRangeExampleStateState extends State<_TableRangeExampleState> {
                   : BoxDecoration(
                       borderRadius: BorderRadius.circular(50.0),
                       border: Border.all(
-                        color: const Color(0xff1A1E23),
+                        color: AppTheme.surface,
                         width: 0.6,
                       ),
                     ),
@@ -544,10 +545,11 @@ class _TableRangeExampleStateState extends State<_TableRangeExampleState> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Image(
-                                      image: NetworkImage(
+                                      image: appImageProvider(
                                         selectedProduct!.images.isEmpty
                                             ? Constants.noImageURL
                                             : selectedProduct.images[0].image,
+                                        width: 400,
                                       ),
                                       fit: BoxFit.cover,
                                     ),
@@ -683,7 +685,7 @@ class _SelectedOrUnavaibleDayContainer extends StatelessWidget {
       ),
       borderRadius: BorderRadius.circular(50.0),
       border: Border.all(
-        color: const Color(0xff1A1E23),
+        color: AppTheme.surface,
         width: 0.6,
       ),
     );

@@ -72,7 +72,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       appBar: CustomAppBar(
         title: selectedProduct.name,
         showArrowBack: true,
@@ -188,7 +188,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               end: Alignment.bottomCenter,
                               stops: [0.1, 1],
                               colors: [
-                                Color(0xff1A1E23),
+                                AppTheme.surface,
                                 Color(0xff16191E),
                               ],
                             ),

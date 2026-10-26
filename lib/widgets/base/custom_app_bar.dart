@@ -22,35 +22,44 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
-        title,
+        title.toUpperCase(),
         style: GoogleFonts.poppins(
-          fontSize: 14,
-          fontWeight: FontWeight.w700,
-          fontStyle: FontStyle.normal,
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 2,
         ),
       ),
       centerTitle: true,
-      backgroundColor: const Color(0x11000000),
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
       leading: showArrowBack!
-          ? IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back_ios,
-                color: AppTheme.secondary,
+          ? Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Center(
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: AppTheme.glass(radius: 20),
+                    child: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: AppTheme.textPrimary),
+                  ),
+                ),
               ),
             )
           : null,
       actions: icon != null
           ? [
-              IconButton(
-                onPressed: () => Navigator.pushNamed(context, "settings"),
-                icon: Icon(
-                  icon!,
-                  color: const Color(
-                    0xff39424C,
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, "settings"),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: AppTheme.glass(radius: 20),
+                    child: Icon(icon!, size: 20, color: AppTheme.gold),
                   ),
                 ),
               )
