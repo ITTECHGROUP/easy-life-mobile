@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/theme/app_theme.dart';
+import 'package:easy_life_club/widgets/base/app_network_image.dart';
 
 import 'package:easy_life_club/models/other_service.dart';
 import '../providers/providers.dart';
@@ -25,7 +27,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     final String? image = servicesProvider.otherServiceInfo['image'];
 
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       appBar: CustomAppBar(
         title: title,
         showArrowBack: true,
@@ -44,7 +46,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                       height: 170,
                       width: double.infinity,
                       child: Image(
-                        image: NetworkImage(image),
+                        image: appImageProvider(image),
                         fit: BoxFit.cover,
                       ),
                     ),

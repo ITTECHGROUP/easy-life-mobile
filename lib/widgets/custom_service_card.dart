@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/theme/app_theme.dart';
+import 'package:easy_life_club/widgets/base/app_network_image.dart';
 
 import 'package:easy_life_club/models/other_service.dart';
 import 'package:easy_life_club/providers/providers.dart';
@@ -25,7 +27,7 @@ class CustomServiceCard extends StatelessWidget {
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Image(
-                image: NetworkImage(service.images.first),
+                image: appImageProvider(service.images.first, width: 450),
                 width: 150,
                 height: 100,
               ),
@@ -76,7 +78,7 @@ class CustomServiceCard extends StatelessWidget {
                       vertical: 10,
                       horizontal: 20,
                     ),
-                    backgroundColor: const Color(0xff1A1E23),
+                    backgroundColor: AppTheme.baseColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),

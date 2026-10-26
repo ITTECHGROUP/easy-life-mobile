@@ -23,7 +23,7 @@ class ToastNotification extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       contentPadding: const EdgeInsets.all(20),
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       elevation: 0,
       content: Stack(
         alignment: Alignment.center,

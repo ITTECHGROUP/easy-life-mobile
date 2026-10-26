@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/widgets/base/app_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -74,14 +75,10 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                             });
                           },
                           itemBuilder: (context, index) {
-                            return Image.network(
+                            return AppNetworkImage(
                               gallery[index],
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Image.network(
-                                Constants.noImageURL,
-                                fit: BoxFit.cover,
-                              ),
                             );
                           },
                         ),

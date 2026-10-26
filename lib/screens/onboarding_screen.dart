@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/theme/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../utils/app_secure_storage.dart';
 import '../widgets/base/base.dart';
@@ -11,7 +12,7 @@ class OnboardingScreen extends StatelessWidget {
     AppSecureStorage.setAppOpenedFirstTime("false");
 
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       body: SafeArea(
         child: Stack(
           children: [

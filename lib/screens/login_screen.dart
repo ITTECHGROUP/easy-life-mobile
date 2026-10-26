@@ -24,85 +24,73 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
-      appBar: AppBar(
-        title: Text(
-          "LOGIN",
-          style: GoogleFonts.poppins(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            fontStyle: FontStyle.normal,
-          ),
-        ),
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: AppTheme.secondary,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: const Color(0x11000000),
-        elevation: 0,
-      ),
+      backgroundColor: AppTheme.baseColor,
+      appBar: const CustomAppBar(title: 'LOGIN', showArrowBack: true),
       body: SafeArea(
         child: Stack(
           children: [
             const Background(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+            Center(
               child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 60),
-                    const Image(
-                      image: AssetImage("assets/logo.png"),
-                      fit: BoxFit.cover,
-                      height: 130,
-                    ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: userNameTextController,
-                      style: const TextStyle(fontSize: 20),
-                      decoration: const InputDecoration(
-                        hintText: "Username",
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 28),
+                  decoration: AppTheme.glass(radius: 28),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Image(
+                        image: AssetImage("assets/logo.png"),
+                        fit: BoxFit.contain,
+                        height: 110,
                       ),
-                    ),
-                    const SizedBox(height: 40),
-                    TextField(
-                      controller: passwordTextController,
-                      style: const TextStyle(fontSize: 20),
-                      decoration: InputDecoration(
-                        hintText: "Password",
-                        suffixIcon: IconButton(
-                          onPressed: () => _changeVisibility(),
-                          icon: Icon(
-                            obscureText
-                                ? Icons.visibility_off
-                                : Icons.visibility,
+                      const SizedBox(height: 22),
+                      Text(
+                        'Welcome back',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Sign in to your Easy Life membership',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.poppins(fontSize: 13, color: AppTheme.secondary),
+                      ),
+                      const SizedBox(height: 28),
+                      TextField(
+                        controller: userNameTextController,
+                        autofillHints: const [AutofillHints.username],
+                        textInputAction: TextInputAction.next,
+                        decoration: const InputDecoration(
+                          hintText: "Username",
+                          prefixIcon: Icon(Icons.person_outline_rounded),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: passwordTextController,
+                        autofillHints: const [AutofillHints.password],
+                        onSubmitted: (_) => login(context, authProvider),
+                        decoration: InputDecoration(
+                          hintText: "Password",
+                          prefixIcon: const Icon(Icons.lock_outline_rounded),
+                          suffixIcon: IconButton(
+                            onPressed: () => _changeVisibility(),
+                            icon: Icon(
+                              obscureText ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                            ),
                           ),
-                          color: AppTheme.secondary,
                         ),
+                        obscureText: obscureText,
                       ),
-                      obscureText: obscureText,
-                    ),
-                    const SizedBox(height: 100),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 60,
-                      ),
-                      child: GestureDetector(
+                      const SizedBox(height: 28),
+                      GestureDetector(
                         onTap: () => login(context, authProvider),
-                        child: const PrimaryButton(
-                          text: "Log in",
-                        ),
+                        child: const PrimaryButton(text: "Log in"),
                       ),
-                    ),
-                    const SizedBox(height: 60),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

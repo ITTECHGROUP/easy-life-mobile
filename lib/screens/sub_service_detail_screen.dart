@@ -1,4 +1,6 @@
 import 'package:easy_life_club/models/other_service.dart';
+import 'package:easy_life_club/theme/app_theme.dart';
+import 'package:easy_life_club/widgets/base/app_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -39,7 +41,7 @@ class _SubServiceDetailScreenState extends State<SubServiceDetailScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0), // Adjust border radius as needed
                 image: DecorationImage(
-                  image: NetworkImage(service.images[index]),
+                  image: appImageProvider(service.images[index], width: 1400),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -50,7 +52,7 @@ class _SubServiceDetailScreenState extends State<SubServiceDetailScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xff1A1E23),
+      backgroundColor: AppTheme.baseColor,
       appBar: CustomAppBar(
         title: service.name,
         showArrowBack: true,
@@ -139,7 +141,7 @@ class _SubServiceDetailScreenState extends State<SubServiceDetailScreen> {
                             vertical: 10,
                             horizontal: 20,
                           ),
-                          backgroundColor: const Color(0xff1A1E23),
+                          backgroundColor: AppTheme.baseColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20),
                           ),
