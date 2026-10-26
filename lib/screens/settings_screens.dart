@@ -154,10 +154,6 @@ class SettingsScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const Align(
-              alignment: Alignment(0, 0.9),
-              child: DeveloperBy(),
-            ),
           ],
         ),
       ),
