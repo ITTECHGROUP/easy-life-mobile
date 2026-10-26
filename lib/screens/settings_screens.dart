@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/constants/features.dart';
 import 'package:easy_life_club/widgets/marketing_opt_in_sheet.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -47,15 +48,17 @@ class SettingsScreen extends StatelessWidget {
                         trailingIcon: Icons.arrow_forward_ios_rounded,
                       ),
                     ),
-                    GestureDetector(
-                      onTap: () => showMarketingOptIn(context),
-                      child: const _SettingsOption(
-                        title: "Email news & offers",
-                        subtitle: "Get exclusive offers, new arrivals and private events by email. Subscribe or unsubscribe anytime.",
-                        leadingIcon: "assets/icons/browser_icon.svg",
-                        trailingIcon: Icons.arrow_forward_ios_rounded,
+                    if (kEmailMarketingEnabled)
+                      GestureDetector(
+                        onTap: () => showMarketingOptIn(context),
+                        child: const _SettingsOption(
+                          title: "Email news & offers",
+                          subtitle:
+                              "Get exclusive offers, new arrivals and private events by email. Subscribe or unsubscribe anytime.",
+                          leadingIcon: "assets/icons/browser_icon.svg",
+                          trailingIcon: Icons.arrow_forward_ios_rounded,
+                        ),
                       ),
-                    ),
                     GestureDetector(
                       onTap: () => Tools.launchInBrowser(
                         Uri.parse("https://easylife-club.com/"),
@@ -63,7 +66,7 @@ class SettingsScreen extends StatelessWidget {
                       child: const _SettingsOption(
                         title: "Visit website",
                         subtitle:
-                            "See information about your account, download an archive of your data, or learn about your account deactivation options.",
+                            "Discover Easy Life Club at easylife-club.com.",
                         leadingIcon: "assets/icons/browser_icon.svg",
                         trailingIcon: Icons.arrow_forward_ios_rounded,
                       ),
@@ -82,7 +85,7 @@ class SettingsScreen extends StatelessWidget {
                       child: const _SettingsOption(
                         title: "Terms and conditions",
                         subtitle:
-                            "Manage your account’s security and keep track of your account’s usage including apps that you have connected to your account.",
+                            "Read our terms of service and privacy policy.",
                         leadingIcon:
                             "assets/icons/terms_and_conditions_icon.svg",
                         trailingIcon: Icons.arrow_forward_ios_rounded,
@@ -95,7 +98,7 @@ class SettingsScreen extends StatelessWidget {
                             child: const _SettingsOption(
                               title: "User Information",
                               subtitle:
-                                  "Anim mollit sint esse ipsum nostrud enim cillum sunt reprehenderit ex exercitation fugiat do pariatur.",
+                                  "Your membership, benefits and profile details.",
                               leadingIcon: "assets/icons/user_icon.svg",
                               trailingIcon: Icons.arrow_forward_ios_rounded,
                             ),
@@ -107,46 +110,11 @@ class SettingsScreen extends StatelessWidget {
                               context,
                               authProvider,
                             ),
-                            child: Card(
-                              color: AppTheme.surface,
-                              elevation: 16,
-                              margin: const EdgeInsets.symmetric(vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                    color: Colors.black.withOpacity(0.05),
-                                    width: 1),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 6, horizontal: 16),
-                                leading: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 8.0, top: 4.0),
-                                      child: SvgPicture.asset(
-                                        "assets/icons/logout_icon.svg",
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: const [
-                                    Icon(
-                                      Icons.arrow_forward_ios_rounded,
-                                      size: 16,
-                                    ),
-                                  ],
-                                ),
-                                title: Text(
-                                  "Logout",
-                                  style:
-                                      AppTheme.darkTheme.textTheme.bodyLarge,
-                                )),
+                            child: const _SettingsOption(
+                              title: "Logout",
+                              leadingIcon: "assets/icons/logout_icon.svg",
+                              trailingIcon: Icons.arrow_forward_ios_rounded,
+                              danger: true,
                             ),
                           )
                         : Container(),
@@ -161,77 +129,122 @@ class SettingsScreen extends StatelessWidget {
   }
 }
 
-class _SettingsOption extends StatelessWidget {
+class _SettingsOption extends StatefulWidget {
   const _SettingsOption({
     Key? key,
     required this.title,
     this.subtitle,
     required this.leadingIcon,
     required this.trailingIcon,
+    this.danger = false,
   }) : super(key: key);
 
   final String title;
   final String? subtitle;
   final String leadingIcon;
   final IconData trailingIcon;
+  final bool danger;
+
+  @override
+  State<_SettingsOption> createState() => _SettingsOptionState();
+}
+
+class _SettingsOptionState extends State<_SettingsOption> {
+  bool _pressed = false;
+
+  void _set(bool v) {
+    if (_pressed != v && mounted) setState(() => _pressed = v);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppTheme.surface.withOpacity(0.72),
-      elevation: 0,
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: Colors.white.withOpacity(0.07), width: 1),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: ListTile(
-        leading: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, top: 4.0),
-              child: 
-              SizedBox(
-                height: 24,
-                width: 24,
+    final accent = widget.danger ? AppTheme.danger : AppTheme.gold;
+    return Listener(
+      onPointerDown: (_) => _set(true),
+      onPointerUp: (_) => _set(false),
+      onPointerCancel: (_) => _set(false),
+      child: AnimatedScale(
+        scale: _pressed ? 0.98 : 1,
+        duration: const Duration(milliseconds: 140),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                AppTheme.surface.withOpacity(0.85),
+                AppTheme.surface.withOpacity(0.6),
+              ],
+            ),
+            border:
+                Border.all(color: accent.withOpacity(_pressed ? 0.7 : 0.18)),
+            boxShadow: [
+              BoxShadow(
+                color: _pressed
+                    ? accent.withOpacity(0.18)
+                    : Colors.black.withOpacity(0.3),
+                blurRadius: _pressed ? 18 : 12,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: accent.withOpacity(0.12),
+                  border: Border.all(color: accent.withOpacity(0.45)),
+                ),
                 child: SvgPicture.asset(
-                  leadingIcon,
-                  color: Colors.white,
+                  widget.leadingIcon,
+                  colorFilter: ColorFilter.mode(accent, BlendMode.srcIn),
                 ),
               ),
-            ),
-          ],
-        ),
-        title: Text(
-          title,
-          style: AppTheme.darkTheme.textTheme.bodyLarge,
-        ),
-        subtitle: subtitle != null
-            ? Text(
-                subtitle!,
-                style: GoogleFonts.poppins(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white.withOpacity(0.8),
-                  height: 1.5,
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.title,
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: widget.danger ? AppTheme.danger : Colors.white,
+                      ),
+                    ),
+                    if (widget.subtitle != null) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        widget.subtitle!,
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            height: 1.45,
+                            color: AppTheme.secondary),
+                      ),
+                    ],
+                  ],
                 ),
-              )
-            : Container(),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 10,
+              ),
+              const SizedBox(width: 10),
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle, color: accent.withOpacity(0.12)),
+                child: Icon(widget.trailingIcon, size: 13, color: accent),
+              ),
+            ],
+          ),
         ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              trailingIcon,
-              size: 16,
-            ),
-          ],
-        ),
-        dense: true,
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:easy_life_club/constants/features.dart';
 import 'package:easy_life_club/providers/auth/auth_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -147,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
       final eventProvider = Provider.of<EventProvider>(context, listen: false);
       await _getEvents(eventProvider);
       _showEventDialog();
-      if (mounted) maybeShowMarketingOptIn(context);
+      if (mounted && kEmailMarketingEnabled) maybeShowMarketingOptIn(context);
     });
   }
 

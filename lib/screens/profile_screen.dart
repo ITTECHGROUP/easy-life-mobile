@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/constants/features.dart';
 import 'package:easy_life_club/services/marketing_service.dart';
 import 'package:easy_life_club/widgets/marketing_opt_in_sheet.dart';
 
@@ -103,8 +104,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                   // todo: end of membership info
-                  const SizedBox(height: 24),
-                  const _EmailUpdatesTile(),
+                  if (kEmailMarketingEnabled) ...[
+                    const SizedBox(height: 24),
+                    const _EmailUpdatesTile(),
+                  ],
 
                   const SizedBox(height: 40),
                   const _CommentField(),
