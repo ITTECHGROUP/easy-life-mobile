@@ -72,14 +72,23 @@ class PushNotificationService {
 
   static void closeStream() => _messageStreamController.close();
 
+  /// FCM token sent to the backend at login (the only time it is stored), so it must not come
+  /// back empty: on iOS getToken() fails until the APNs token exists, which can take a few
+  /// seconds after the permission prompt. requestPermission() already waits for APNs; retry
+  /// getToken() a few times as well instead of logging in without a token.
   static Future<String?> deviceToken() async {
     await requestPermission();
-    try {
-      return await FirebaseMessaging.instance.getToken();
-    } on FirebaseException catch (e) {
-      log('Error getting device token: ${e.message}');
-      return null;
+    for (var attempt = 0; attempt < 4; attempt++) {
+      try {
+        final token = await FirebaseMessaging.instance.getToken();
+        if (token != null && token.isNotEmpty) return token;
+      } catch (e) {
+        log('Device token not ready (attempt ${attempt + 1}): $e');
+      }
+      await Future.delayed(const Duration(seconds: 2));
     }
+    log('Could not get a device token; logging in without it');
+    return null;
   }
 
   static Future<AuthorizationStatus> requestPermission() async {
