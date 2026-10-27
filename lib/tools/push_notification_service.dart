@@ -16,6 +16,8 @@ class PushNotificationService {
   static Stream<Map<String, dynamic>> get messageStream =>
       _messageStreamController.stream;
 
+  // Must survive tree-shaking in release builds (runs in a separate isolate on Android).
+  @pragma('vm:entry-point')
   static Future _backgroundHandler(RemoteMessage message) async {
     _messageStreamController.add({
       'app_state': AppStates.background,
@@ -82,23 +84,30 @@ class PushNotificationService {
 
   static Future<AuthorizationStatus> requestPermission() async {
     NotificationSettings settings = await messaging.requestPermission();
-    if (Platform.isIOS) {
-      String? apnsToken = await messaging.getAPNSToken();
-      if (apnsToken != null) {
-        await messaging.subscribeToTopic('all_devices');
-      } else {
-        await Future.delayed(const Duration(seconds: 3));
-        apnsToken = await messaging.getAPNSToken();
-        if (apnsToken != null) {
-          await messaging.subscribeToTopic('all_devices');
+    await ensureTopicSubscription();
+    return settings.authorizationStatus;
+  }
+
+  /// Subscribes this device to the broadcast topic. Safe to call on every launch (idempotent):
+  /// on iOS the APNs token can arrive late, so a single attempt at permission time may miss it.
+  static Future<void> ensureTopicSubscription() async {
+    try {
+      if (Platform.isIOS) {
+        String? apnsToken = await messaging.getAPNSToken();
+        for (var i = 0; apnsToken == null && i < 5; i++) {
+          await Future.delayed(const Duration(seconds: 2));
+          apnsToken = await messaging.getAPNSToken();
+        }
+        if (apnsToken == null) {
+          log('APNs token not available yet; will retry on next launch');
+          return;
         }
       }
-    } else {
-      messaging.subscribeToTopic('all_devices');
+      await messaging.subscribeToTopic('all_devices');
+      log('Subscribed to topic: all_devices');
+    } catch (e) {
+      log('Topic subscription failed, will retry on next launch: $e');
     }
-    
-    print('Subscribed to topic: all_devices');
-    return settings.authorizationStatus;
   }
 
   static Future<bool> hasPermission() async {

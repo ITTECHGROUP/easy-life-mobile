@@ -73,6 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     if (!hasPermission) {
       await PushNotificationService.requestPermission();
+    } else {
+      // Already allowed: make sure the broadcast subscription exists (no prompt shown).
+      await PushNotificationService.ensureTopicSubscription();
     }
   }
 
