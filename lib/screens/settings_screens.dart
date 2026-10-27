@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:easy_life_club/tools/push_notification_service.dart';
+import 'package:flutter/services.dart';
 import 'package:easy_life_club/constants/features.dart';
 import 'package:easy_life_club/widgets/marketing_opt_in_sheet.dart';
 import 'package:flutter_svg/svg.dart';
@@ -118,6 +120,8 @@ class SettingsScreen extends StatelessWidget {
                             ),
                           )
                         : Container(),
+                    const SizedBox(height: 28),
+                    const _DiagnosticsFooter(),
                   ],
                 ),
               ),
@@ -125,6 +129,92 @@ class SettingsScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Footer; a long press opens hidden push-notification diagnostics (for support/testing).
+class _DiagnosticsFooter extends StatelessWidget {
+  const _DiagnosticsFooter();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onLongPress: () => showDialog(context: context, builder: (_) => const _PushDiagnosticsDialog()),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Center(
+          child: Text(
+            'EASY LIFE CLUB',
+            style: GoogleFonts.poppins(fontSize: 11, letterSpacing: 2.4, color: AppTheme.secondary),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PushDiagnosticsDialog extends StatefulWidget {
+  const _PushDiagnosticsDialog();
+
+  @override
+  State<_PushDiagnosticsDialog> createState() => _PushDiagnosticsDialogState();
+}
+
+class _PushDiagnosticsDialogState extends State<_PushDiagnosticsDialog> {
+  Map<String, String>? info;
+
+  Future<void> _load({bool requestFirst = false}) async {
+    setState(() => info = null);
+    if (requestFirst) await PushNotificationService.requestPermission();
+    final d = await PushNotificationService.diagnostics();
+    if (mounted) setState(() => info = d);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final token = info?['FCM token'] ?? '';
+    final hasToken = token.length > 40 && !token.startsWith('error');
+    return AlertDialog(
+      title: Text('Push diagnostics', style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
+      content: SizedBox(
+        width: 320,
+        child: info == null
+            ? const SizedBox(height: 80, child: Center(child: CircularProgressIndicator()))
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    for (final e in info!.entries) ...[
+                      Text(e.key.toUpperCase(),
+                          style: GoogleFonts.poppins(fontSize: 10, letterSpacing: 1.4, color: AppTheme.gold)),
+                      const SizedBox(height: 2),
+                      SelectableText(e.value, style: GoogleFonts.poppins(fontSize: 12, color: AppTheme.textPrimary)),
+                      const SizedBox(height: 12),
+                    ],
+                  ],
+                ),
+              ),
+      ),
+      actions: [
+        TextButton(onPressed: () => _load(requestFirst: true), child: const Text('Retry')),
+        if (hasToken)
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: token));
+              ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text('FCM token copied')));
+            },
+            child: const Text('Copy token'),
+          ),
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Close')),
+      ],
     );
   }
 }

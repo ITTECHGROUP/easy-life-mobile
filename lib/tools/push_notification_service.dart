@@ -11,6 +11,8 @@ enum AppStates { background, foreground, terminated }
 
 class PushNotificationService {
   static FirebaseMessaging messaging = FirebaseMessaging.instance;
+  // Last failure while getting tokens/subscribing; shown in the hidden diagnostics screen.
+  static String lastError = '';
   static final StreamController<Map<String, dynamic>> _messageStreamController =
       StreamController.broadcast();
   static Stream<Map<String, dynamic>> get messageStream =>
@@ -83,6 +85,7 @@ class PushNotificationService {
         final token = await FirebaseMessaging.instance.getToken();
         if (token != null && token.isNotEmpty) return token;
       } catch (e) {
+        lastError = 'getToken failed: $e';
         log('Device token not ready (attempt ${attempt + 1}): $e');
       }
       await Future.delayed(const Duration(seconds: 2));
@@ -108,6 +111,7 @@ class PushNotificationService {
           apnsToken = await messaging.getAPNSToken();
         }
         if (apnsToken == null) {
+          lastError = 'APNs token not available after waiting (Apple did not register the device)';
           log('APNs token not available yet; will retry on next launch');
           return;
         }
@@ -115,6 +119,7 @@ class PushNotificationService {
       await messaging.subscribeToTopic('all_devices');
       log('Subscribed to topic: all_devices');
     } catch (e) {
+      lastError = 'Topic subscription failed: $e';
       log('Topic subscription failed, will retry on next launch: $e');
     }
   }
@@ -124,5 +129,32 @@ class PushNotificationService {
         (await messaging.getNotificationSettings()).authorizationStatus;
     return status == AuthorizationStatus.authorized ||
         status == AuthorizationStatus.provisional;
+  }
+
+  /// Snapshot for the hidden diagnostics screen (Settings → long-press the footer).
+  static Future<Map<String, String>> diagnostics() async {
+    final out = <String, String>{};
+    try {
+      final settings = await messaging.getNotificationSettings();
+      out['Permission'] = settings.authorizationStatus.name;
+    } catch (e) {
+      out['Permission'] = 'error: $e';
+    }
+    if (Platform.isIOS) {
+      try {
+        final apns = await messaging.getAPNSToken();
+        out['APNs token'] = apns == null ? 'MISSING' : 'OK (${apns.length} chars)';
+      } catch (e) {
+        out['APNs token'] = 'error: $e';
+      }
+    }
+    try {
+      final token = await messaging.getToken();
+      out['FCM token'] = token ?? 'null';
+    } catch (e) {
+      out['FCM token'] = 'error: $e';
+    }
+    out['Last error'] = lastError.isEmpty ? '—' : lastError;
+    return out;
   }
 }
