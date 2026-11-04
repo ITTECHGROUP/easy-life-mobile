@@ -236,36 +236,6 @@ class _HomeScreenState extends State<HomeScreen> {
               duration: (index + 1) * 100,
             ),
             if (isNewItem) _newItemOverlay(),
-            if (isNewItem)
-              const Positioned(
-                top: 32,
-                right: 16,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: _kGold,
-                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black38,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                    child: Text(
-                      'NEW',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
           ],
         );
 
