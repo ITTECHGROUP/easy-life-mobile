@@ -17,17 +17,7 @@ import 'package:easy_life_club/widgets/widgets.dart';
 import 'package:easy_life_club/screens/home_screen/components/partners_carousel.dart';
 import 'package:easy_life_club/screens/home_screen/components/event_dialog.dart';
 
-/// Dorado de la webpage (Easy Life Cars)
-const Color _kGold = Color(0xFFD4AF37);
 
-const double _cardRadius = 22;
-const double _cardMarginH = 0;
-const double _cardMarginV = 12;
-
-const double _imageInsetH = 8;
-const double _imageInsetTop = 12;
-const double _imageBottomFraction = 0.77;
-const double _imageRadius = 17;
 
 /// Orden del home:
 /// 0 Rental cars, 1 Rental yachts, 2 Private transports, 3 Private jets,
@@ -155,22 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Widget _newItemOverlay() {
-    return const Positioned.fill(
-      child: IgnorePointer(
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: _cardMarginH,
-            vertical: _cardMarginV,
-          ),
-          child: CustomPaint(
-            painter: _NewCardPainter(),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final menuProvider = Provider.of<MenuProvider>(context);
@@ -224,7 +198,6 @@ class _HomeScreenState extends State<HomeScreen> {
       menu?.length ?? 0,
       (index) {
         final currentMenu = menu![index];
-        final bool isNewItem = currentMenu.name.toLowerCase() == 'cars for sale';
 
         Widget cardContent = Stack(
           children: [
@@ -235,7 +208,6 @@ class _HomeScreenState extends State<HomeScreen> {
               tag: currentMenu.name,
               duration: (index + 1) * 100,
             ),
-            if (isNewItem) _newItemOverlay(),
           ],
         );
 
@@ -372,69 +344,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
-
-class _NewCardPainter extends CustomPainter {
-  const _NewCardPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-
-    final outer = RRect.fromRectAndRadius(rect, const Radius.circular(_cardRadius));
-
-    const imgRadius = Radius.circular(_imageRadius);
-    final imageRRect = RRect.fromLTRBAndCorners(
-      _imageInsetH,
-      _imageInsetTop,
-      size.width - _imageInsetH,
-      size.height * _imageBottomFraction,
-      topLeft: imgRadius,
-      topRight: imgRadius,
-      bottomLeft: Radius.zero,
-      bottomRight: Radius.zero,
-    );
-
-    final gradientPath = Path()
-      ..fillType = PathFillType.evenOdd
-      ..addRRect(outer)
-      ..addRRect(imageRRect);
-
-    final fillPaint = Paint()
-      ..style = PaintingStyle.fill
-      ..shader = LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          _kGold.withOpacity(0.40),
-          _kGold.withOpacity(0.28),
-          AppTheme.primary.withOpacity(0.0),
-        ],
-        stops: const [0.0, 0.75, 1.0],
-      ).createShader(rect);
-
-    canvas.drawPath(gradientPath, fillPaint);
-
-    const strokeWidth = 1.4;
-    final borderRRect = RRect.fromRectAndRadius(
-      rect.deflate(strokeWidth / 2),
-      const Radius.circular(_cardRadius),
-    );
-
-    final borderPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..shader = const LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [_kGold, Color(0x33D4AF37)],
-      ).createShader(rect);
-
-    canvas.drawRRect(borderRRect, borderPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _NewCardPainter oldDelegate) => false;
 }
 
 class _WelcomeHeader extends StatelessWidget {
