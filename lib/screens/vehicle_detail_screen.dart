@@ -18,6 +18,11 @@ class VehicleDetailScreen extends StatefulWidget {
 
 class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
   int _currentImageIndex = 0;
+  bool _showAllSpecs = false;
+  bool _showFullDescription = false;
+
+  // Shown first; anything else goes behind "View all specifications" to keep the screen clean.
+  static const _keyFactOrder = ['Year', 'Mileage', 'Engine', 'Horsepower', 'Transmission', 'Drivetrain'];
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +31,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
 
     if (vehicle == null) {
       return Scaffold(
-        backgroundColor: AppTheme.primary,
+        backgroundColor: AppTheme.baseColor,
         appBar: const CustomAppBar(title: 'VEHICLE DETAILS', showArrowBack: true),
         body: const Center(
           child: Text('No vehicle selected', style: TextStyle(color: Colors.white)),
@@ -38,16 +43,26 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
         ? vehicle.images
         : (vehicle.image.isNotEmpty ? [vehicle.image] : [Constants.noImageURL]);
 
-    final String displayPrice = vehicle.priceLabel.isNotEmpty
-        ? (vehicle.priceLabel.startsWith('\$') ? vehicle.priceLabel : '\$${vehicle.priceLabel}')
-        : '\$${vehicle.price}';
+    final String displayPrice = vehicle.priceLabel;
+
+    final allSpecs = <Spec>[
+      if (vehicle.year.isNotEmpty) Spec('Year', vehicle.year),
+      if (vehicle.mileageLabel.isNotEmpty) Spec('Mileage', vehicle.mileageLabel),
+      ...vehicle.specifications.map(
+        (x) => x.label == 'Horsepower' && num.tryParse(x.value) != null ? Spec(x.label, '${x.value} hp') : x,
+      ),
+    ];
+    final keyFacts = [
+      for (final label in _keyFactOrder) ...allSpecs.where((x) => x.label == label),
+    ];
+    final moreSpecs = allSpecs.where((x) => !_keyFactOrder.contains(x.label)).toList();
 
     final String descriptionText = vehicle.description is List
         ? (vehicle.description as List).join('\n')
         : vehicle.description.toString();
 
     return Scaffold(
-      backgroundColor: AppTheme.primary,
+      backgroundColor: AppTheme.baseColor,
       appBar: CustomAppBar(
         title: vehicle.name.toUpperCase(),
         showArrowBack: true,
@@ -82,7 +97,24 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                             );
                           },
                         ),
-                        if (gallery.length > 1)
+                        // Too many dots would overflow the row: use a counter instead.
+                        if (gallery.length > 12)
+                          Positioned(
+                            bottom: 12,
+                            right: 12,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.65),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${_currentImageIndex + 1} / ${gallery.length}',
+                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          )
+                        else if (gallery.length > 1)
                           Positioned(
                             bottom: 12,
                             left: 0,
@@ -98,7 +130,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: _currentImageIndex == index
-                                        ? Colors.amber
+                                        ? AppTheme.gold
                                         : Colors.white54,
                                   ),
                                 ),
@@ -135,7 +167,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: Colors.amber,
+                                  color: AppTheme.gold,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: const Text(
@@ -150,13 +182,49 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                           ],
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          displayPrice,
-                          style: const TextStyle(
-                            color: Colors.amber,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                displayPrice,
+                                style: const TextStyle(
+                                  color: AppTheme.gold,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            if (vehicle.status != 'available')
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: AppTheme.gold.withOpacity(0.6)),
+                                ),
+                                child: Text(
+                                  vehicle.status.toUpperCase(),
+                                  style: const TextStyle(
+                                    color: AppTheme.gold,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.location_on_outlined, size: 16, color: AppTheme.secondary),
+                            const SizedBox(width: 4),
+                            Expanded(
+                              child: Text(
+                                vehicle.location,
+                                style: const TextStyle(color: AppTheme.secondary, fontSize: 13),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -191,15 +259,57 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                           mainAxisSpacing: 8,
                           crossAxisSpacing: 8,
                           children: [
-                            if (vehicle.year.toString().isNotEmpty)
-                              _SpecTile(title: 'Year', value: vehicle.year.toString()),
-                            if (vehicle.mileage.toString().isNotEmpty)
-                              _SpecTile(
-                                title: 'Mileage',
-                                value: '${vehicle.mileage} miles',
-                              ),
+                            for (final fact in keyFacts) _SpecTile(title: fact.label, value: fact.value),
                           ],
                         ),
+                        if (moreSpecs.isNotEmpty) ...[
+                          AnimatedSize(
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeOut,
+                            alignment: Alignment.topCenter,
+                            child: _showAllSpecs
+                                ? Padding(
+                                    padding: const EdgeInsets.only(top: 10),
+                                    child: Column(
+                                      children: [for (final spec in moreSpecs) _SpecRow(spec: spec)],
+                                    ),
+                                  )
+                                : const SizedBox(width: double.infinity),
+                          ),
+                          Center(
+                            child: TextButton.icon(
+                              onPressed: () => setState(() => _showAllSpecs = !_showAllSpecs),
+                              icon: Icon(
+                                _showAllSpecs ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                                color: AppTheme.gold,
+                              ),
+                              label: Text(
+                                _showAllSpecs ? 'Show less' : 'View all specifications (${moreSpecs.length})',
+                                style: const TextStyle(color: AppTheme.gold),
+                              ),
+                            ),
+                          ),
+                        ],
+                        if (vehicle.carfaxUrl.isNotEmpty) ...[
+                          const SizedBox(height: 6),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppTheme.gold,
+                                side: BorderSide(color: AppTheme.gold.withOpacity(0.5)),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              onPressed: () {
+                                final uri = Uri.tryParse(vehicle.carfaxUrl);
+                                if (uri != null) launchUrl(uri, mode: LaunchMode.externalApplication);
+                              },
+                              icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                              label: const Text('View Carfax report'),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -226,12 +336,23 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                           const SizedBox(height: 8),
                           Text(
                             descriptionText,
+                            maxLines: _showFullDescription ? null : 4,
+                            overflow: _showFullDescription ? TextOverflow.visible : TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 14,
                               height: 1.4,
                             ),
                           ),
+                          if (descriptionText.length > 180 || '\n'.allMatches(descriptionText).length > 3)
+                            TextButton(
+                              style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                              onPressed: () => setState(() => _showFullDescription = !_showFullDescription),
+                              child: Text(
+                                _showFullDescription ? 'Read less' : 'Read more',
+                                style: const TextStyle(color: AppTheme.gold),
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -257,7 +378,7 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                 ),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
+                    backgroundColor: AppTheme.gold,
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -287,6 +408,37 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _SpecRow extends StatelessWidget {
+  const _SpecRow({required this.spec});
+  final Spec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white12))),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(spec.label, style: const TextStyle(color: Colors.white54, fontSize: 13)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 3,
+            child: Text(
+              spec.value,
+              textAlign: TextAlign.right,
+              style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ],
       ),
     );
   }

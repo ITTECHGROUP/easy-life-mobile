@@ -52,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<MenuOption>? storedMenu;
   // Order saved from the admin panel (Firestore `config/menu`); empty = default ranking.
   List<String> _remoteOrder = const [];
+  // Cover chosen from the admin panel for "Cars for sale" (it isn't a Django service).
+  String? _carsForSaleImage;
   int _currentEventIndex = 0;
 
   Future<void> checkNotificationsPermissions() async {
@@ -73,7 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final snap = await FirebaseFirestore.instance.collection('config').doc('menu').get();
       final order = List<String>.from((snap.data()?['order'] as List?) ?? const []);
-      if (mounted && order.isNotEmpty) setState(() => _remoteOrder = order);
+      final image = (snap.data()?['carsForSaleImage'] ?? '').toString();
+      if (mounted) {
+        setState(() {
+          if (order.isNotEmpty) _remoteOrder = order;
+          if (image.isNotEmpty) _carsForSaleImage = image;
+        });
+      }
     } catch (e) {
       log('Menu order unavailable, using default: $e');
     }
@@ -182,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
             id: 8888,
             name: 'Cars for sale',
             route: 'cars',
-            image: 'assets/carsForSaleBackground.jpeg',
+            image: _carsForSaleImage ?? 'assets/carsForSaleBackground.jpeg',
           ),
         );
       }
