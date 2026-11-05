@@ -74,6 +74,19 @@ class _MyAppState extends State<MyApp> {
       Future<void> navigateToNotification() async {
         ServicesProvider servicesProvider =
             Provider.of<ServicesProvider>(context, listen: false);
+
+        // Sent from the panel's Cars for sale bell: these cars live in Firebase.
+        if (notification.type == 'cars for sale') {
+          servicesProvider.serviceType = 'cars_for_sale';
+          await servicesProvider.fetchVehiclesFromFirebase();
+          servicesProvider.screeTitle = 'Cars for Sale';
+          navigatorKey.currentState?.pushNamedAndRemoveUntil(
+            'products',
+            (route) => route.isFirst,
+          );
+          return;
+        }
+
         servicesProvider.serviceType = 'services';
         servicesProvider.resetProducts();
 
