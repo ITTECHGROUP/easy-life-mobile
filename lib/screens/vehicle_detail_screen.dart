@@ -7,6 +7,7 @@ import '../constants/constants.dart';
 import '../models/vehicle_model.dart';
 import '../providers/services/services_provider.dart';
 import '../theme/app_theme.dart';
+import '../tools/tools.dart';
 import '../widgets/base/base.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
@@ -384,17 +385,9 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () async {
-                    final String msg = Uri.encodeComponent(
-                      'Hi! I am interested in the vehicle: ${vehicle.name} ($displayPrice).',
-                    );
-                    final Uri whatsappUrl =
-                        Uri.parse('https://wa.me/?text=$msg');
-                    if (await canLaunchUrl(whatsappUrl)) {
-                      await launchUrl(whatsappUrl,
-                          mode: LaunchMode.externalApplication);
-                    }
-                  },
+                  onPressed: () => Tools.sendSimpleWhatsAppMessage(
+                    'Hi! I am interested in the vehicle: ${vehicle.name} ($displayPrice).',
+                  ),
                   child: const Text(
                     'I\'M INTERESTED',
                     style: TextStyle(
