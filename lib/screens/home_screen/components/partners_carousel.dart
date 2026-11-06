@@ -23,7 +23,7 @@ class PartnersCarousel extends StatelessWidget {
   }
 
   Future<void> _launchEasyLifeCarsUrl() async {
-    final Uri url = Uri.parse('https://easylife-auto-find.lovable.app/');
+    final Uri url = Uri.parse('https://easylife-auto-find.vercel.app/');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       await launchUrl(url, mode: LaunchMode.platformDefault);
     }
