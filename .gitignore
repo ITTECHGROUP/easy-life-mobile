@@ -12,7 +12,6 @@ migrate_working_dir/
 .env
 .staging.env
 upload_certificate.pem
-google-services.json
 .vscode
 
 

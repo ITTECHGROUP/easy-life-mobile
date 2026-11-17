@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "558705895015",
+    "project_id": "easy-life-test-3a81c",
+    "storage_bucket": "easy-life-test-3a81c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558705895015:android:63040b5046dbbe400c56c2",
+        "android_client_info": {
+          "package_name": "com.easy.easy_life_club"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi0cNzm0qSoZQvksKgFHJzoQ3frysh1DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558705895015:android:a8405127badc502c0c56c2",
+        "android_client_info": {
+          "package_name": "com.easy.easy_life_club_test"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBi0cNzm0qSoZQvksKgFHJzoQ3frysh1DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
