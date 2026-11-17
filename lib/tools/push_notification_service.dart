@@ -18,6 +18,16 @@ class PushNotificationService {
   static Stream<Map<String, dynamic>> get messageStream =>
       _messageStreamController.stream;
 
+  // Tap that launched the app from a closed state. Nobody is listening yet when it is read,
+  // so Home delivers it once it is on screen (see deliverPendingTap).
+  static Map<String, dynamic>? _pendingTap;
+
+  static void deliverPendingTap() {
+    final tap = _pendingTap;
+    _pendingTap = null;
+    if (tap != null) _messageStreamController.add(tap);
+  }
+
   // Must survive tree-shaking in release builds (runs in a separate isolate on Android).
   @pragma('vm:entry-point')
   static Future _backgroundHandler(RemoteMessage message) async {
@@ -70,6 +80,18 @@ class PushNotificationService {
     FirebaseMessaging.onBackgroundMessage(_backgroundHandler);
     FirebaseMessaging.onMessage.listen(_onMessageHandler);
     FirebaseMessaging.onMessageOpenedApp.listen(_onMessageOpenApp);
+
+    // onMessageOpenedApp only covers an app in the background; a tap that starts the app
+    // arrives here instead and was ignored, leaving the user on Home.
+    final initial = await messaging.getInitialMessage();
+    if (initial != null) {
+      _pendingTap = {
+        'app_state': AppStates.terminated,
+        'title': initial.notification?.title,
+        'body': initial.notification?.body,
+        ...initial.data,
+      };
+    }
   }
 
   static void closeStream() => _messageStreamController.close();

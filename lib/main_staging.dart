@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:easy_life_club/models/vehicle_model.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
@@ -84,8 +85,25 @@ class _MyAppState extends State<MyApp> {
             'products',
             (route) => route.isFirst,
           );
+          // The panel prefills the message with the car's name; open that car when found.
+          final text = '${notification.title} ${notification.body}'.toLowerCase();
+          Vehicle? match;
+          for (final v in servicesProvider.firestoreVehicles.whereType<Vehicle>()) {
+            final name = v.name.trim().toLowerCase();
+            if (name.isNotEmpty &&
+                text.contains(name) &&
+                (match == null || name.length > match.name.length)) {
+              match = v;
+            }
+          }
+          if (match != null) {
+            servicesProvider.setSelectedVehicle(match);
+            navigatorKey.currentState?.pushNamed('vehicle_detail');
+          }
           return;
         }
+
+        if (notification.serviceId == 0) return;
 
         servicesProvider.serviceType = 'services';
         servicesProvider.resetProducts();

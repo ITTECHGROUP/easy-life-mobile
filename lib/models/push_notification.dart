@@ -19,11 +19,12 @@ class PushNotification {
 
   factory PushNotification.fromMap(Map<String, dynamic> map) {
     return PushNotification(
-      title: map['title'],
-      body: map['body'],
-      type: map['type'],
-      productId: int.tryParse(map['product_id']),
-      serviceId: int.parse(map['service_id']),
+      title: map['title'] ?? '',
+      body: map['body'] ?? '',
+      type: (map['type'] ?? '').toString(),
+      productId: int.tryParse((map['product_id'] ?? '').toString()),
+      // Pushes sent from the Firebase console carry no service; 0 means "just open the app".
+      serviceId: int.tryParse((map['service_id'] ?? '').toString()) ?? 0,
       appState: map['app_state'],
     );
   }

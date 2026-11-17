@@ -145,6 +145,9 @@ class _HomeScreenState extends State<HomeScreen> {
     preLoadMenu();
     _loadMenuOrder();
 
+    // Open the notification that launched the app, now that Home is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) => PushNotificationService.deliverPendingTap());
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final eventProvider = Provider.of<EventProvider>(context, listen: false);
       await _getEvents(eventProvider);
