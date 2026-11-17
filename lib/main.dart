@@ -29,7 +29,12 @@ Future<void> main() async {
     // Web is only used to preview the UI: no push notifications or Crashlytics there.
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   } else {
-    await PushNotificationService.initializeApp();
+    try {
+      await PushNotificationService.initializeApp()
+          .timeout(const Duration(seconds: 10));
+    } catch (e) {
+      debugPrint('Push setup did not finish: $e');
+    }
 
     // Pass all uncaught "fatal" errors from the framework to Crashlytics
     FlutterError.onError = (errorDetails) {

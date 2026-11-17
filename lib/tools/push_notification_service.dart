@@ -21,8 +21,10 @@ class PushNotificationService {
   // Tap that launched the app from a closed state. Nobody is listening yet when it is read,
   // so Home delivers it once it is on screen (see deliverPendingTap).
   static Map<String, dynamic>? _pendingTap;
+  static bool _homeReady = false;
 
   static void deliverPendingTap() {
+    _homeReady = true;
     final tap = _pendingTap;
     _pendingTap = null;
     if (tap != null) _messageStreamController.add(tap);
@@ -83,15 +85,22 @@ class PushNotificationService {
 
     // onMessageOpenedApp only covers an app in the background; a tap that starts the app
     // arrives here instead and was ignored, leaving the user on Home.
-    final initial = await messaging.getInitialMessage();
-    if (initial != null) {
-      _pendingTap = {
-        'app_state': AppStates.terminated,
-        'title': initial.notification?.title,
-        'body': initial.notification?.body,
-        ...initial.data,
-      };
-    }
+    // Never await it: this runs before runApp, and on iOS it can stall, which left the app
+    // frozen on the launch logo (1.5.6 build 63).
+    messaging
+        .getInitialMessage()
+        .timeout(const Duration(seconds: 8))
+        .then((initial) {
+          if (initial == null) return;
+          _pendingTap = {
+            'app_state': AppStates.terminated,
+            'title': initial.notification?.title,
+            'body': initial.notification?.body,
+            ...initial.data,
+          };
+          if (_homeReady) deliverPendingTap();
+        })
+        .catchError((Object e) => log('getInitialMessage: $e'));
   }
 
   static void closeStream() => _messageStreamController.close();
